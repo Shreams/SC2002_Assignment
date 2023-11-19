@@ -2,4 +2,4 @@
 Camp Application and Management System. For NTU. I am in great pain.
 
 
-Team members: Bryan Ng Sheng Yuan, Brian Soh Han Yu, Fong Keng Le
+Team members: Bryan Ng Sheng Yuan, Brian Soh Han Yu, Hong Sheng Yang, Fong Keng Le
