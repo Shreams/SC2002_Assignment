@@ -2,7 +2,19 @@ package org.example.appview.views.staff;
 
 import org.example.appview.interfaces.IAppView;
 
+/**
+ * The {@code CampStaffMainCampMenu} class represents a view for displaying menu options
+ * for a staff member in the application.
+ * It implements the {@code IAppView} interface to provide the display functionality.
+ * This class is part of the {@code org.example.appview.views.staff} package.
+ *
+ * @author Group1
+ * @version 1.0
+ */
 public class CampStaffMainCampMenu implements IAppView {
+	 /**
+     * Displays menu options for a staff member with navigation choices.
+     */
     @Override
     public void display() {
         System.out.println("\n*********** Camps ***********");

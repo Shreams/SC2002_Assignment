@@ -2,6 +2,12 @@ package org.example.extractexcel;
 
 import org.example.users.enums.UserType;
 
+/**
+ * The ExtractExcelModel class represents Excel data in a structured format.
+ *
+ * @author Group1
+ * @version 1.0
+ */
 public class ExtractExcelModel implements IExtractExcel {
 
     private String name;
@@ -10,6 +16,15 @@ public class ExtractExcelModel implements IExtractExcel {
     private UserType userType;
     private String userID;
 
+    /**
+     * Constructs an ExtractExcelModel object.
+     *
+     * @param name     The name extracted from Excel.
+     * @param email    The email extracted from Excel.
+     * @param faculty  The faculty extracted from Excel.
+     * @param userType The user type extracted from Excel.
+     * @param userID   The user ID extracted from Excel.
+     */
     public ExtractExcelModel(String name, String email, String faculty, UserType userType, String userID) {
         this.name = name;
         this.email = email;

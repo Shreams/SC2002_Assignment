@@ -1,23 +1,33 @@
 package org.example.reports.utils;
 
 import org.example.filters.controllers.FilterReportController;
-import org.example.reports.interfaces.IReport;
 import org.example.reports.models.ReportModel;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.TreeMap;
 
-public class GenerateTxt implements IReport {
+/**
+ * @author Group1
+ * @version 1.0
+ * 
+ * This class inherites the {@link GenerateReport} interface and provides methods
+ * to generate TXT reports for camp-related data.
+ */
+public class GenerateTxt extends GenerateReport {
 
+	
+	/**
+     * Generates a TXT report for the Camp Committee.
+     *
+     * @param reportModel A TreeMap containing camp-related data.
+     * @param points      A HashMap containing points for committee members.
+     */
 	@Override
 	public void generateCampCommitteeReport(TreeMap<String, ReportModel> reportModel, HashMap<String, Integer> points) {
 		System.out.println("Generating TXT report for Camp Committee...");
@@ -85,6 +95,11 @@ public class GenerateTxt implements IReport {
 	    }
 	}
 
+	 /**
+     * Generates a TXT report based on various filters.
+     *
+     * @param reportModel A TreeMap containing camp-related data.
+     */
     @Override
     public void generateReport(TreeMap<String, ReportModel> reportModel) {
         System.out.println("Generating TXT report...");

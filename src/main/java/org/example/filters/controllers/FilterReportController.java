@@ -1,22 +1,40 @@
 package org.example.filters.controllers;
 
+import org.example.filters.utilities.CustomComparator;
 import org.example.reports.models.ReportModel;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+/**
+ * The FilterReportController class manages filtering operations on ReportModel objects.
+ * This controller takes a TreeMap of ReportModel objects and provides methods to filter reports.
+ *
+ * @author Group1
+ * @version 1.0
+ */
 public class FilterReportController {
 
     private TreeMap<String, ReportModel> reports;
 
 
+    /**
+     * Constructs a FilterReportController with a TreeMap of ReportModel objects.
+     *
+     * @param reports A TreeMap containing ReportModel objects.
+     */
     public FilterReportController(TreeMap<String, ReportModel> reports){
         this.reports = reports;
     }
 
 
+    /**
+     * Filters the reports by camp name.
+     *
+     * @param campName The name of the camp to filter the reports.
+     * @return A TreeMap containing filtered reports sorted by a custom comparator.
+     */
     public TreeMap<String, ReportModel> filterByCampName(String campName){
         HashMap<String, ReportModel> temp = new HashMap<String, ReportModel>();
 
@@ -32,8 +50,14 @@ public class FilterReportController {
         
         return sorted;
     }
-    
-    public TreeMap<String, ReportModel> filterByCampCommitteeName(String CampCommitteeName){
+
+    /**
+     * Filters the reports by camp committee name.
+     *
+     * @param campCommitteeName The name of the camp committee to filter the reports.
+     * @return A TreeMap containing filtered reports sorted by a custom comparator.
+     */
+    public TreeMap<String, ReportModel> filterByCampCommitteeName(String campCommitteeName){
         HashMap<String, ReportModel> temp = new HashMap<String, ReportModel>();
         
         for (String key : reports.keySet()) {
@@ -41,7 +65,7 @@ public class FilterReportController {
         	CampCommitteeList = reports.get(key).getCampCommitteeName();
 
         	for (String CampCommittee : CampCommitteeList) {
-	            if (CampCommittee.trim().equalsIgnoreCase(CampCommitteeName.trim())) {
+	            if (CampCommittee.trim().equalsIgnoreCase(campCommitteeName.trim())) {
 	                temp.put(key, reports.get(key));
 	            }
         	}
@@ -52,16 +76,22 @@ public class FilterReportController {
 
         return sorted;
     }
-    
-    
-    public TreeMap<String, ReportModel> filterByAttendeeName(String AttendeeName){
+
+
+    /**
+     * Filters the reports by attendee name.
+     *
+     * @param attendeeName The name of the attendee to filter the reports.
+     * @return A TreeMap containing filtered reports sorted by a custom comparator.
+     */
+    public TreeMap<String, ReportModel> filterByAttendeeName(String attendeeName){
     	
         HashMap<String, ReportModel> temp = new HashMap<String, ReportModel>();
                 
         for (String key : reports.keySet()) {
         	ArrayList<String> ParticipantList = reports.get(key).getParticipantsName();
         	for (String Participant : ParticipantList) {
-	            if (Participant.trim().equalsIgnoreCase(AttendeeName.trim())) {
+	            if (Participant.trim().equalsIgnoreCase(attendeeName.trim())) {
 	                temp.put(key, reports.get(key));
 	            }
         	}
@@ -74,24 +104,4 @@ public class FilterReportController {
     }
 
 
-    static class CustomComparator implements Comparator<String> {
-        @Override
-        public int compare(String str1, String str2) {
-            // case-insensitive
-            // if is abc vs abcd, abc is consider first
-            int result = str1.compareToIgnoreCase(str2);
-            int keepComparing = 0;
-
-            // If the strings are the same (ignoring case), compare by case-sensitive
-            // natural order
-            if (result == 0) {
-                // keepComparing < Math.min(str1.length(), str2.length()) so dont go out of range
-                while (keepComparing >= 0 && result == 0 && keepComparing < Math.min(str1.length(), str2.length())) {
-                    result = Character.compare(str1.charAt(keepComparing), str2.charAt(keepComparing));
-                    keepComparing++;
-                }
-            }
-            return result;
-        }
-    }
 }

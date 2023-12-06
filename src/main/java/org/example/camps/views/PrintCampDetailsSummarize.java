@@ -4,6 +4,14 @@ import org.example.camps.interfaces.ICampView;
 
 import java.util.Date;
 
+
+/**
+ * Represents a summary view of camp details.
+ * Implements the ICampView interface to display summarized camp information.
+ *
+ * @author Group1
+ * @version 1.0
+ */
 public class PrintCampDetailsSummarize implements ICampView {
 
     private String campName;
@@ -16,6 +24,18 @@ public class PrintCampDetailsSummarize implements ICampView {
     private int remainingSlots;
     private int remainingCommitteeSlots;
 
+
+    /**
+     * Initializes the PrintCampDetailsSummarize object with camp details for summarizing information.
+     *
+     * @param campName             The name of the camp.
+     * @param campLocation         The location of the camp.
+     * @param startDate            The start date of the camp.
+     * @param endDate              The end date of the camp.
+     * @param registrationEndDate  The registration end date for the camp.
+     * @param remainingSlots       The remaining participant slots (total slots - total committed slots - number of participants).
+     * @param remainingCommitteeSlots  The remaining committee slots.
+     */
     public PrintCampDetailsSummarize(String campName, String campLocation, Date startDate, Date endDate, Date registrationEndDate, int remainingSlots, int remainingCommitteeSlots) {
         this.campName = campName;
         this.campLocation = campLocation;

@@ -1,6 +1,5 @@
 package org.example.reports.utils;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -8,7 +7,6 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.example.filters.controllers.FilterReportController;
-import org.example.reports.interfaces.IReport;
 import org.example.reports.models.ReportModel;
 
 import java.io.File;
@@ -20,8 +18,23 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.TreeMap;
 
-public class GenerateCsv implements IReport {
+/**
+ * @author Group1
+ * @version 1.0
+ * 
+ * The `GenerateCsv` class is responsible for generating CSV reports based on camp committee data and general reports.
+ * It implements the `IReport` interface, providing methods for generating camp committee reports and general reports.
+ * These reports are created using the Apache POI library for Excel manipulation.
+ */
+public class GenerateCsv extends GenerateReport {
 	
+	
+	/**
+     * Generates a CSV report for camp committee members.
+     *
+     * @param reportModel A TreeMap containing camp committee report data.
+     * @param points      A HashMap containing points data for committee members.
+     */
 	@Override
 	public void generateCampCommitteeReport(TreeMap<String, ReportModel> reportModel, HashMap<String, Integer> points) {
 		System.out.println("Generating Csv report for Camp Committee...");
@@ -96,6 +109,11 @@ public class GenerateCsv implements IReport {
 	    }
 	}
 	
+	/**
+     * Generates a general CSV report based on various filtering criteria.
+     *
+     * @param reportModel A TreeMap containing general report data.
+     */
     @Override
     public void generateReport(TreeMap<String, ReportModel> reportModel) {
         System.out.println("Generating CSV report...");

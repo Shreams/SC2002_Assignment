@@ -1,17 +1,23 @@
 package org.example.filters.controllers;
 
+import org.example.camps.interfaces.ICampView;
+import org.example.camps.models.CampModel;
+import org.example.camps.views.PrintCampDetailsSummarize;
+import org.example.filters.utilities.CustomComparator;
+import org.example.filters.views.FilterByMenu;
+
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import org.example.camps.interfaces.ICampView;
-//import org.example.camps.controllers.CampController.CustomComparator;
-import org.example.camps.models.CampModel;
-import org.example.camps.views.PrintCampDetailsSummarize;
-import org.example.filters.interfaces.IFilterView;
-import org.example.filters.views.FilterByMenu;
 
+/**
+ * The FilterViewController class handles filtering and displaying camps based on various criteria.
+ *
+ * @author Group1
+ * @version 1.0
+ */
 public class FilterViewController {
     //
 
@@ -22,15 +28,35 @@ public class FilterViewController {
     private ArrayList<String> tempCampName;
     private ICampView view;
 
-    private IFilterView filterView;
 
+    /**
+     * Default constructor for FilterViewController.
+     */
     public FilterViewController(){};
 
+
+
+    /**
+     * Constructor for FilterViewController that takes in a HashMap of camps.
+     *
+     * @param camps The HashMap containing camps.
+     */
     public FilterViewController(HashMap<String, CampModel> camps) {
         this.camps = camps;
 
     }
 
+
+    /**
+     * View camps filtered by start date based on various criteria.
+     *
+     * @param userID           The user ID.
+     * @param requireVisibility Boolean indicating whether visibility is required.
+     * @param facultyName      The faculty name.
+     * @param parsedDate       The parsed date.
+     * @param viewAll          Boolean indicating whether to view all camps.
+     * @return An ArrayList of camp names filtered by start date.
+     */
     public ArrayList<String> viewCampsFilterByStartDate(String userID, boolean requireVisibility, String facultyName,
                                                         Date parsedDate, boolean viewAll) {
         int idx = 1;
@@ -61,7 +87,7 @@ public class FilterViewController {
 
                 if (viewAll) {
                     tempCamp.put(entry.getKey(), camp);
-                } else if ((camp.getStaffInChargeID().equals(userID)) && viewAll == false) {
+                } else if ((camp.getStaffInChargeID().equals(userID)) && !viewAll) {
                     tempCamp.put(entry.getKey(), camp);
                 }
 
@@ -81,7 +107,7 @@ public class FilterViewController {
                 if (zonedDateTime.toLocalDate().compareTo(LocalDate.of(yearInput, monthInput, dayInput)) != 0) {
                     continue;
                 }
-                if (viewAll && (camp.isVisbility() && (camp.getCampAccessbility().equals(facultyName)
+                if (viewAll && (camp.isVisibility() && (camp.getCampAccessbility().equals(facultyName)
                         || camp.getCampAccessbility().equals("NTU")))) {
                     tempCamp.put(entry.getKey(), camp);
                 } else {
@@ -139,6 +165,15 @@ public class FilterViewController {
         return tempCampName;
     }
 
+    /**
+     * Retrieves camps that a user is associated with, either as a staff member or a participant.
+     *
+     * @param userID      The user ID for retrieving associated camps.
+     * @param isStudent   A boolean indicating whether the user is a student.
+     * @param facultyName The faculty name for filtering camps.
+     * @return An ArrayList containing names of camps associated with the user.
+     *         Returns null if the user has no associated camps.
+     */
     public ArrayList<String> viewMyCamps(String userID, boolean isStudent, String facultyName) {
         int idx = 1;
         System.out.println("#################################");
@@ -195,6 +230,17 @@ public class FilterViewController {
         return tempCampName;
     }
 
+    /**
+     * Retrieves camps filtered by registration date, based on specific criteria.
+     *
+     * @param userID            The user ID for filtering camps.
+     * @param requireVisibility A boolean indicating whether visibility is required.
+     * @param facultyName       The faculty name for filtering camps.
+     * @param parsedDate        The parsed registration end date for filtering camps.
+     * @param viewAll           A boolean indicating whether to view all camps.
+     * @return An ArrayList containing names of camps filtered by registration date.
+     *         Returns null if no camps match the criteria.
+     */
     public ArrayList<String> viewCampsFilterByRegDate(String userID, boolean requireVisibility, String facultyName,
                                                       Date parsedDate, boolean viewAll) {
         // start is 1
@@ -247,7 +293,7 @@ public class FilterViewController {
                 if (zonedDateTime.toLocalDate().compareTo(LocalDate.of(yearInput, monthInput, dayInput)) != 0) {
                     continue;
                 }
-                if (viewAll && camp.isVisbility() && (camp.getCampAccessbility().equals(facultyName)
+                if (viewAll && camp.isVisibility() && (camp.getCampAccessbility().equals(facultyName)
                         || camp.getCampAccessbility().equals("NTU"))) {
                     tempCamp.put(entry.getKey(), camp);
                 } else {
@@ -305,6 +351,17 @@ public class FilterViewController {
         return tempCampName;
     }
 
+    /**
+     * Retrieves camps filtered by location, based on specific criteria.
+     *
+     * @param userID            The user ID for filtering camps.
+     * @param requireVisibility A boolean indicating whether visibility is required.
+     * @param facultyName       The faculty name for filtering camps.
+     * @param findLocation      The location to search for in camps.
+     * @param viewAll           A boolean indicating whether to view all camps.
+     * @return An ArrayList containing names of camps filtered by location.
+     *         Returns null if no camps match the criteria.
+     */
     public ArrayList<String> viewCampsFilterByLocation(String userID, boolean requireVisibility, String facultyName, String findLocation, boolean viewAll) {
         int idx = 1;
         tempCamp = new HashMap<>();
@@ -332,7 +389,7 @@ public class FilterViewController {
             for (Map.Entry<String, CampModel> entry : camps.entrySet()) {
                 CampModel camp = entry.getValue();
                 //
-                if (viewAll && camp.isVisbility()
+                if (viewAll && camp.isVisibility()
                         && (camp.getCampAccessbility().equals(facultyName) || camp.getCampAccessbility().equals("NTU"))
                         && camp.getLocation().equalsIgnoreCase(findLocation)) {
 
@@ -400,15 +457,22 @@ public class FilterViewController {
         return tempCampName;
     }
 
+
+    /**
+     * Retrieves camps filtered by camp name, based on specific criteria.
+     *
+     * @param userID            The user ID for filtering camps.
+     * @param requireVisibility A boolean indicating whether visibility is required.
+     * @param facultyName       The faculty name for filtering camps.
+     * @param campName          The camp name to search for in camps.
+     * @param viewAll           A boolean indicating whether to view all camps.
+     * @return An ArrayList containing names of camps filtered by camp name.
+     *         Returns null if no camps match the criteria.
+     */
     public ArrayList<String> viewCampsFilterByCampName(String userID, boolean requireVisibility, String facultyName, String campName, boolean viewAll) {
         int idx = 1;
         tempCamp = new HashMap<>();
         tempCampName = new ArrayList<>();
-
-//		System.out.println("The list is sorted in alphabetical order of camp names with the filter location");
-//		System.out.println("The same char, the shorter string first");
-//		System.out.println("UpperCase first then smaller case");
-//		System.out.println();
 
         if (!requireVisibility) {
             for (Map.Entry<String, CampModel> entry : camps.entrySet()) {
@@ -427,7 +491,7 @@ public class FilterViewController {
             for (Map.Entry<String, CampModel> entry : camps.entrySet()) {
                 CampModel camp = entry.getValue();
                 //
-                if (viewAll && camp.isVisbility()
+                if (viewAll && camp.isVisibility()
                         && (camp.getCampAccessbility().equals(facultyName) || camp.getCampAccessbility().equals("NTU"))
                         && camp.getCampName().equalsIgnoreCase(campName)) {
 
@@ -495,6 +559,15 @@ public class FilterViewController {
         return tempCampName;
     }
 
+    /**
+     * Displays all camps based on specific criteria and returns an ArrayList of camp names.
+     *
+     * @param userID            The user ID for filtering camps.
+     * @param requireVisibility A boolean indicating whether visibility is required.
+     * @param facultyName       The faculty name for filtering camps.
+     * @return An ArrayList containing names of camps that meet the criteria.
+     *         Returns null if no camps are created yet or if none meet the filtering criteria.
+     */
     public ArrayList<String> viewAllCamps(String userID, boolean requireVisibility, String facultyName) {
         int idx = 1;
         System.out.println("#################################");
@@ -525,7 +598,7 @@ public class FilterViewController {
             for (Map.Entry<String, CampModel> entry : camps.entrySet()) {
                 CampModel camp = entry.getValue();
 
-                if (camp.isVisbility() && (camp.getCampAccessbility().equals(facultyName)
+                if (camp.isVisibility() && (camp.getCampAccessbility().equals(facultyName)
                         || camp.getCampAccessbility().equals("NTU"))) {
 
                     tempCamp.put(entry.getKey(), camp);
@@ -565,17 +638,16 @@ public class FilterViewController {
     }
 
 
-    public void render(IFilterView filterView) {
-        this.filterView = filterView;
-        this.filterView.display();
-    }
-
-
-    public int menuSelectChoice() {
+    /**
+     * Method to display the menu and select a choice.
+     *
+     * @return The selected choice.
+     */
+    public int viewMenuSelectChoice() {
         Scanner sc = new Scanner(System.in);
         while(true){
             try{
-                render(new FilterByMenu());
+                (new FilterByMenu()).display();
 
                 int choice = sc.nextInt();
                 sc.nextLine();
@@ -594,28 +666,5 @@ public class FilterViewController {
         }
     }
 
-    static class CustomComparator implements Comparator<String> {
-        @Override
-        public int compare(String str1, String str2) {
-            // case-insensitive
-            // if is abc vs abcd, abc is consider first
-            int result = str1.compareToIgnoreCase(str2);
-            int keepComparing = 0;
-
-            // If the strings are the same (ignoring case), compare by case-sensitive
-            // natural order
-            if (result == 0) {
-                // keepComparing < Math.min(str1.length(), str2.length()) so dont go out of
-                // range
-                while (keepComparing >= 0 && result == 0 && keepComparing < Math.min(str1.length(), str2.length())) {
-                    result = Character.compare(str1.charAt(keepComparing), str2.charAt(keepComparing));
-                    keepComparing++;
-
-                }
-            }
-
-            return result;
-        }
-    }
 }
 

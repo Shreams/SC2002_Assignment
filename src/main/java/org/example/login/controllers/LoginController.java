@@ -7,28 +7,43 @@ import org.example.login.interfaces.ILoginDisplay;
 import org.example.login.views.LoginView;
 import org.example.login.views.LoginWrongUserView;
 import org.example.users.interfaces.IUser;
-
 import java.util.Date;
 import java.util.Scanner;
-
+/**
+ * The {@code LoginController} class handles user authentication and related operations.
+ * It provides methods for logging in, accessing and modifying user information, and more.
+ * This class is part of the {@code org.example.login.controllers} package.
+ *
+ * @author Group1
+ * @version 1.0
+ */
 public class LoginController {
 
     //Authentication layer
+	/**
+	 * The LoginModel for the user that is currently login.
+	 */
     private LoginModel userObj = null;
-
-    private ILoginDisplay view;
-
+    /**
+     * The scanner used for user input.
+     */
     private Scanner scanner = new Scanner(System.in);
-
-    private Date loginDate;
-
+    /**
+     * Constructs a new LoginController.
+     */
     public LoginController() {}
 
 
     // ######################
     // #  Authentication    #
     // ######################
-
+    /**
+     * Authenticates the user with the provided credentials.
+     *
+     * @param user     The user interface for retrieving user information.
+     * @param userType The type of the user (staff or student).
+     * @throws Exception If authentication fails.
+     */
     public void login(IUser user, UserType userType) throws Exception {
 
         System.out.print("Enter userID: ");
@@ -38,7 +53,7 @@ public class LoginController {
 
         String[] userCredentials = user.retrieveUser(username);
 
-        if (authenticate(userCredentials,username, password)) {
+        if (new Authentication().authenticate(userCredentials, username, password)) {
             userObj = new LoginModel(username, password, userType, user.getUserFacultyName(username));
             System.out.println("Login successful");
         }else {
@@ -46,47 +61,57 @@ public class LoginController {
         }
     }
 
-    private boolean authenticate(String[] userCredentials,String username, String password) {
-
-        if(userCredentials.length ==0){
-            //showWrongUser();
-            throw new IllegalArgumentException("Wrong username or password");
-        }
-
-        return userCredentials[0].equals(username) && userCredentials[1].equals(password);
-    }
-
     // ########################
     // #  Accessor & Mutator  #
     // ########################
-
-    public String getUserID(){
+    /**
+     * Gets the user ID associated with the logged-in user.
+     *
+     * @return The user ID.
+     * @throws Exception If the user object is null.
+     */
+    public String getUserID() throws Exception{
         if(userObj == null){
-            throw new IllegalArgumentException("User object cannot be null");
+            throw new Exception("User object cannot be null");
         } else {
             return userObj.getUserID();
         }
     }
-
-    public String getFacultyName(){
+    /**
+     * Gets the faculty name associated with the logged-in user.
+     *
+     * @return The faculty name.
+     * @throws Exception If the user object is null.
+     */
+    public String getFacultyName() throws Exception{
         if(userObj == null){
-            throw new IllegalArgumentException("User object cannot be null");
+            throw new Exception("User object cannot be null");
         } else {
             return userObj.getFacultyName();
         }
     }
-
-    public Date getLoginDate(){
+    /**
+     * Gets the login date associated with the logged-in user.
+     *
+     * @return The login date.
+     * @throws Exception If the user object is null.
+     */
+    public Date getLoginDate() throws Exception{
         if(userObj == null){
-            throw new IllegalArgumentException("User object cannot be null");
+            throw new Exception("User object cannot be null");
         } else {
             return userObj.getLoginDate();
         }
     }
-
-    public void setPassword(IUser user) {
+    /**
+     * Sets a new password for the logged-in user.
+     *
+     * @param user The user interface for updating user password.
+     * @throws Exception If the user object is null.
+     */
+    public void setPassword(IUser user) throws Exception{
         if(userObj == null){
-            throw new IllegalArgumentException("User object cannot be null");
+            throw new Exception("User object cannot be null");
         } else {
             System.out.println("Please change your password");
             System.out.print("Enter new password: ");
@@ -96,49 +121,36 @@ public class LoginController {
             userObj.changePassword(newPassword);
 
             //Update database
-            user.setPassword(getUserID(), newPassword);
+            user.setPassword(userObj.getUserID(), newPassword);
         }
     }
 
     // ################
     // #  Validators  #
     // ################
-
-    public boolean isUsingDefaultPassword(){
-        if(userObj == null){
-            throw new IllegalArgumentException("User object cannot be null");
-        } else {
-            return userObj.getPassword().equals("password");
-        }
+    /**
+     * Checks if the user is using the default password.
+     *
+     * @return True if the user is using the default password, false otherwise.
+     * @throws IllegalArgumentException If the user object is null.
+     */
+    public boolean isUsingDefaultPassword() throws IllegalArgumentException{
+        return new Authentication().isUsingDefaultPassword(userObj);
     }
 
-//    public String[] retrieveUser(String userID) {
-//        if(userObj == null){
-//            throw new IllegalArgumentException("User object cannot be null");
-//        } else {
-//            return new String[]{userObj.getUserID(), userObj.getPassword()};
-//        }
-//    }
-
+    /**
+     * Logs out the current user.
+     */
     public void logout() {
-
         userObj = null;
-        showLogOut();
-
+        (new LogOutView()).display();
     }
-
-    public void showLogOut() {
-        view = new LogOutView();
-        view.display();
-    }
-
-    public void showWrongUser() {
-        view = new LoginWrongUserView();
-        view.display();
-    }
-
-    public void showLoginScreen() {
-        view = new LoginView();
+    /**
+     * Renders the specified login display view.
+     *
+     * @param view The login display view to render.
+     */
+    public void render(ILoginDisplay view){
         view.display();
     }
 

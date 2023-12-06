@@ -2,7 +2,17 @@ package org.example.appview.views;
 
 import org.example.appview.interfaces.IAppView;
 
-public class HomeView implements IAppView{
+/**
+ * Represents the home view of the application.
+ *
+ * @author Group1
+ * @version 1.0
+ */
+public class HomeView implements IAppView {
+
+    /**
+     * Displays the home view options.
+     */
     @Override
     public void display() {
         System.out.println("\n*********** Home ***********");

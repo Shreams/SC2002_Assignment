@@ -1,8 +1,9 @@
 package org.example.camps.controllers;
 
 
-import org.example.camps.interfaces.ICampController;
-import org.example.camps.interfaces.ICampView;
+import org.example.camps.interfaces.ICampCRUD;
+import org.example.camps.interfaces.ICampControllerView;
+import org.example.camps.interfaces.ICampInfoGetters;
 import org.example.camps.views.CreateCampView;
 
 import java.text.ParseException;
@@ -11,14 +12,25 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
-// Act as a controller for the Staff class to talk to camp controllers
-public class CampStaffController implements ICampController {
+/**
+ * This class manages interactions and operations related to a staff's involvement in camps.
+ * It interfaces with the {@link CampController} to modify camp-related information.
+ *
+ * @author Group1
+ * @version 1.0
+ */
+public class CampStaffController implements ICampCRUD, ICampControllerView, ICampInfoGetters {
 
-    private ICampView view;
 
     private CampController campController;
 
 
+
+    /**
+     * Constructs a CampStudentController object with a CampController.
+     *
+     * @param campController The CampController instance to interact with camp-related operations.
+     */
     public CampStaffController(CampController campController) {
         this.campController = campController;
     }
@@ -28,13 +40,22 @@ public class CampStaffController implements ICampController {
     // #  Validators  #
     // ################
 
-    public boolean isCampsCreated(){
+    /**
+     * Checks if any camps are created.
+     *
+     * @return True if there are no camps created; otherwise, false.
+     */
+    public boolean isCampsCreated() {
         return campController.isAllCampsEmpty();
     }
 
-
-    // Return a boolan if there is any camp created by the staff
-    public boolean hasAnyCamps (String userID){
+    /**
+     * Checks if a staff member has any camps created.
+     *
+     * @param userID The ID of the staff member.
+     * @return True if the staff member has created camps; otherwise, false.
+     */
+    public boolean hasAnyCamps(String userID) {
         return campController.hasAnyCamps(userID, false, "");
     }
 
@@ -139,28 +160,20 @@ public class CampStaffController implements ICampController {
     }
 
 
-    @Override
-    public void render(ICampView view) {
-        this.view = view;
-        view.display();
-    }
 
-    @Override
-    public ArrayList<String> viewAllCamps (String userID, String facultyName){
-        return campController.viewAllCamps(userID, false, facultyName);
-    }
-
-    @Override
-    public void viewMyCamps (String userID, String facultyName){
-        // For staff is all the camps they created
-        campController.viewMyCamps(userID, false, facultyName);
-    }
+//    @Override
+//    public void viewMyCamps (String userID, String facultyName){
+//        // For staff is all the camps they created
+//        campController.viewMyCamps(userID, false, facultyName);
+//    }
 
 
     // ####################
     // #  Camp Modifiers  #
     // ####################
 
+
+    @Override
     public String createCamp(String userID, String facultyName) {
 
         String campName = "";
@@ -168,7 +181,7 @@ public class CampStaffController implements ICampController {
         while (true) {
             try {
                 // Ask all the detail here
-                render(new CreateCampView());
+                (new CreateCampView()).display();
 
 
                 while (true) {
@@ -344,10 +357,12 @@ public class CampStaffController implements ICampController {
         return campName;
     }
 
+    @Override
     public void deleteCamp(String userID, String campID) {
         campController.deleteCamp(userID, campID);
     }
 
+    @Override
     public void editCamp(String userID, String campID, String facultyName) {
         // Ask all the detail here
         Scanner sc = new Scanner(System.in);
@@ -619,41 +634,50 @@ public class CampStaffController implements ICampController {
     // #  Accessor & Mutator  #
     // ########################
 
-    public String getStaffInChargeIDOfCamp(String campID) {
+    /**
+     * Retrieves the staff in charge's ID for a specific camp.
+     *
+     * @param campID The ID of the camp to retrieve the staff in charge's ID.
+     * @return The staff in charge's ID for the specified camp.
+     */
+    public String getStaffInChargeID(String campID) {
         return campController.getStaffInChargeID(campID);
     }
 
-    public ArrayList<String> getParticipantsInCamp(String campID) {
-        return campController.getCampParticipants(campID);
-    }
 
-    public ArrayList<String> getCampCommitteeInCamp(String campID) {
-        return campController.getCampCommittee(campID);
-    }
-
-    public ArrayList<String> getBlacklistInCamp(String campID) {
-        return campController.getCampBlacklist(campID);
-    }
-
+    /**
+     * Retrieves camp details for generating a report.
+     *
+     * @param campName The name of the camp to retrieve details for the report.
+     * @return An ArrayList containing camp details required for generating a report.
+     */
     public ArrayList<Object> getCampDetailsForReport(String campName) {
         return campController.getCampDetailsForReport(campName);
     }
 
-    public ArrayList<String> getAllCampIDsUnderStaff(String userID) {
-        return campController.getAllCampIDsUnderStaff(userID);
+    @Override
+    public ArrayList<String> getParticipantsInCamp(String campID) {
+        return campController.getCampParticipants(campID);
     }
 
-    public ArrayList<String> getCampNames (String userID, String facultyName){
+    @Override
+    public ArrayList<String> getCampCommitteeInCamp(String campID) {
+        return campController.getCampCommittee(campID);
+    }
+
+    @Override
+    public ArrayList<String> getBlacklistInCamp(String campID) {
+        return campController.getCampBlacklist(campID);
+    }
+
+    @Override
+    public ArrayList<String> getCampNames(String userID, String facultyName){
         return campController.getCampsNames(userID, false, facultyName);
     }
 
-    @Override
-    public String getCampName(int idx, String userID) {
-        return campController.getCampName(idx, userID, false);
-    }
 
     @Override
-    public void getCampDetails(String campName) {
+    public void showCampDetails(String campName) {
         campController.showCampDetails(campName);
     }
 

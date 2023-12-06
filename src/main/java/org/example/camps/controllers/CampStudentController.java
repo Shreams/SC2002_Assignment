@@ -1,7 +1,8 @@
 package org.example.camps.controllers;
 
-import org.example.camps.interfaces.ICampController;
-import org.example.camps.interfaces.ICampView;
+import org.example.camps.interfaces.ICampControllerView;
+import org.example.camps.interfaces.ICampInfoGetters;
+import org.example.camps.interfaces.ICampStudentControllerValidators;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,28 +10,40 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
-// Act as a controller for the Student class to talk to camp controllers
-public class CampStudentController implements ICampController {
+/**
+ * This class manages interactions and operations related to a student's involvement in camps.
+ * It interfaces with the {@link CampController} to modify camp-related information.
+ *
+ * @author Group1
+ * @version 1.0
+ */
+public class CampStudentController implements ICampControllerView, ICampStudentControllerValidators, ICampInfoGetters {
 
-    private ICampView view;
+
     private CampController campController;
 
+
+    /**
+     * Constructs a CampStudentController object with a CampController.
+     *
+     * @param campController The CampController instance to interact with camp-related operations.
+     */
     public CampStudentController(CampController campController) {
         this.campController = campController;
     }
-
-    @Override
-    public void render(ICampView view) {
-        this.view = view;
-        view.display();
-    }
-
 
 
     // ####################
     // #  Camp Modifiers  #
     // ####################
 
+    /**
+     * Allows a user to withdraw from a camp.
+     *
+     * @param campID The ID of the camp from which the user wants to withdraw.
+     * @param userID The ID of the user who wants to withdraw from the camp.
+     * @return True if the withdrawal is successful; otherwise, false.
+     */
     public boolean withdrawFromCamp(String campID, String userID){
         // By withdrawing
         // Need to check if user is part of the camp and is not a camp committee
@@ -56,7 +69,7 @@ public class CampStudentController implements ICampController {
                     return true;
                 } else if (confirm.equals("N") || confirm.equals("n"))
                     System.out.println("Withdrawal cancelled");
-                    return false;
+                return false;
 
             }catch (Exception e){
                 System.out.println("Invalid input");
@@ -65,6 +78,16 @@ public class CampStudentController implements ICampController {
         }
     }
 
+    /**
+     * Allows a user to join a camp based on specified criteria.
+     *
+     * @param userID        The ID of the user attempting to join the camp.
+     * @param campName      The name of the camp to join.
+     * @param facultyName   The name of the faculty associated with the camp.
+     * @param isCampCommittee Indicates if the user is joining as part of the camp committee.
+     * @param currentDate   The current date when the join request is made.
+     * @return True if the user successfully joins the camp; otherwise, false.
+     */
     public boolean joinCamp(String userID, String campName, String facultyName, boolean isCampCommittee, Date currentDate){
         // Need check if camp is full
         // need check if student is blacklisted
@@ -85,16 +108,16 @@ public class CampStudentController implements ICampController {
         } else if(isStudentPastRegistrationDate(campName, currentDate)){
             System.out.println("Unable to join camp as registration date has passed");
 
-        } else if(willStudentCampDatesClash(campName)){
+        } else if(isCampDateOverlapping(campName, userID)){
             System.out.println("Unable to join camp as camp dates will clash with another camp");
 
         } else if(isStudentAlreadyPartOfCamp(campName, userID)){
             System.out.println("Unable to join camp as you are already part of the camp");
 
-        } else if(isStudentAlreadyPartOfCampCommittee(campName, userID)){
+        } else if(isStudentAlreadyPartOfCampCommittee(campName, userID) && isCampCommittee){
             System.out.println("Unable to join camp as you are already part of the camp committee");
 
-        } else if(isStudentAlreadyPartOfCampCommitteeOfAnotherCamp(userID)){
+        } else if(isAlreadyPartOfCampCommitteeOfAnotherCamp(userID) && isCampCommittee){
             System.out.println("Unable to join camp as you are already part of the camp committee of another camp");
 
         } else {
@@ -111,57 +134,69 @@ public class CampStudentController implements ICampController {
                 System.out.println("Successfully joined as camp participant");
                 return true;
             }
-
         }
-
         return false;
-
     }
-
 
 
     // ################
     // #  Validators  #
     // ################
 
-    public boolean hasAnyCampsToView(String userID, String facultyName){
-        return campController.hasAnyCampsToView(userID, facultyName);
+    /**
+     * Checks if a student has any camps available to view within a specific faculty.
+     *
+     * @param userID       The ID of the student.
+     * @param facultyName  The name of the faculty to filter camps.
+     * @return True if the student has any camps available to view within the specified faculty; otherwise, false.
+     */
+    public boolean hasAnyCampsToViewForStudents(String userID, String facultyName){
+        return campController.hasAnyCampsToViewForStudents(userID, facultyName);
     }
 
-    private boolean willStudentCampDatesClash(String campName){
-        return campController.isCampDateOverlapping(campName);
+
+    @Override
+    public boolean isCampDateOverlapping(String campName, String userID){
+        return campController.isCampDateOverlapping(campName, userID);
     }
 
-    private boolean isStudentPastRegistrationDate(String campName, Date currentDate){
+    @Override
+    public boolean isStudentPastRegistrationDate(String campName, Date currentDate){
         Date registrationEndDate = campController.getCampRegistrationEndDate(campName);
 
         return currentDate.after(registrationEndDate);
     }
 
+    @Override
     public boolean isStudentAlreadyPartOfCampCommittee(String campName, String studentID){
         ArrayList<String> campCommittee = campController.getCampCommittee(campName);
 
         return campCommittee.contains(studentID);
     }
 
-    public boolean isStudentAlreadyPartOfCampCommitteeOfAnotherCamp(String studentID){
+
+    @Override
+    public boolean isAlreadyPartOfCampCommitteeOfAnotherCamp(String studentID){
         return campController.isAlreadyPartOfCampCommitteeOfAnotherCamp(studentID);
     }
 
-    private boolean isCampCommitteeFull(String campName){
+    @Override
+    public boolean isCampCommitteeFull(String campName){
         int numOfCommittee = campController.getCampCommittee(campName).size();
         int numOfCommitteeSlots = campController.getCampCommitteeSlots(campName);
 
         return numOfCommittee >= numOfCommitteeSlots;
     }
 
-    private boolean isStudentAlreadyPartOfCamp(String campName, String studentID){
+    @Override
+    public boolean isStudentAlreadyPartOfCamp(String campName, String studentID){
         ArrayList<String> students = campController.getCampParticipants(campName);
 
         return students.contains(studentID);
     }
 
-    private boolean isStudentBlacklisted(String campID, String studentID){
+    @Override
+    public boolean isStudentBlacklisted(String campID, String studentID){
         ArrayList<String> blackList = campController.getCampBlacklist(campID);
 
         return blackList.contains(studentID);
@@ -266,33 +301,54 @@ public class CampStudentController implements ICampController {
     }
 
 
-    @Override
-    public ArrayList<String> viewAllCamps(String userID, String facultyName) {
-        return campController.viewAllCamps(userID, true, facultyName);
-    }
-
-
-    @Override
-    public void viewMyCamps(String userID, String facultyName) {
-        // For student is all the camps they have joined
-        campController.viewMyCamps(userID, true, facultyName);
-    }
+//    @Override
+//    public void viewMyCamps(String userID, String facultyName) {
+//        // For student is all the camps they have joined
+//        campController.viewMyCamps(userID, true, facultyName);
+//    }
 
 
     // ########################
     // #  Accessor & Mutator  #
     // ########################
 
+    /**
+     * Retrieves the camp name associated with the camp committee of a student.
+     *
+     * @param studentID The ID of the student.
+     * @return The camp name associated with the student's camp committee or null if not found.
+     */
+    public String getCampNameOfCampCommittee(String studentID){
+        // Check if student is part of camp committee of another camp
+        if (!isAlreadyPartOfCampCommitteeOfAnotherCamp(studentID))
+            return null;
+
+        return campController.getCampNameOfCampCommittee(studentID);
+    }
+
+    /**
+     * Adds a student to the blacklist of a camp.
+     *
+     * @param campID    The ID of the camp.
+     * @param studentID The ID of the student to be added to the blacklist.
+     */
+    public void addStudentToBlacklist(String campID, String studentID){
+        campController.addStudentToBlacklist(campID, studentID);
+    }
+
+
     @Override
-    public void getCampDetails(String campName) {
+    public void showCampDetails(String campName) {
         campController.showCampDetails(campName);
     }
 
-    @Override
-    public String getCampName(int idx, String userID){
-        return campController.getCampName(idx, userID, true);
-    }
-
+    /**
+     * Checks if there are any camps available for a specific user and faculty.
+     *
+     * @param userID      The user ID for checking camps.
+     * @param facultyName The faculty name for filtering camps.
+     * @return A boolean indicating if the user has any available camps within the specified faculty.
+     */
     public boolean hasAnyCamps(String userID, String facultyName){
         return campController.hasAnyCamps(userID, true, facultyName);
     }
@@ -302,34 +358,18 @@ public class CampStudentController implements ICampController {
         return campController.getCampsNames(userID, true, facultyName);
     }
 
-    public int getNumOfCampsToView(String userID, String facultyName){
-        return campController.getNumOfCampsToView(userID, facultyName);
-    }
 
-    public String getCampNameToView(int idx, String userID, String facultyName){
-        return campController.getCampNameToView(idx, userID, facultyName);
-    }
-
-    public String getCampNameOfCampCommittee(String studentID){
-        // Check if student is part of camp committee of another camp
-        if (!isStudentAlreadyPartOfCampCommitteeOfAnotherCamp(studentID))
-            return null;
-
-        return campController.getCampNameOfCampCommittee(studentID);
-    }
-
-    public void addStudentToBlacklist(String campID, String studentID){
-        campController.addStudentToBlacklist(campID, studentID);
-    }
-
+    @Override
     public ArrayList<String> getParticipantsInCamp(String campID) {
         return campController.getCampParticipants(campID);
     }
 
+    @Override
     public ArrayList<String> getCampCommitteeInCamp(String campID) {
         return campController.getCampCommittee(campID);
     }
 
+    @Override
     public ArrayList<String> getBlacklistInCamp(String campID) {
         return campController.getCampBlacklist(campID);
     }

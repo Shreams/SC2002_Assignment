@@ -2,8 +2,19 @@ package org.example.filters.views;
 
 import org.example.filters.interfaces.IFilterView;
 
+/**
+ * This class represents a filter menu view for selecting various filter options.
+ * It implements the IFilterView interface for displaying filter-related information.
+ *
+ * @author Group1
+ * @version 1.0
+ */
 public class FilterByMenu implements IFilterView {
 
+    /**
+     * Displays the filter menu options to navigate.
+     * Options include No Filter, Location, Start Date, Registration End Date, Camp Name, and Back.
+     */
     @Override
     public void display() {
 

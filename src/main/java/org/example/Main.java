@@ -8,12 +8,13 @@ import org.example.camps.controllers.CampController;
 import org.example.camps.controllers.CampStaffController;
 import org.example.camps.controllers.CampStudentController;
 import org.example.filters.controllers.FilterViewController;
+import org.example.login.views.LoginView;
 import org.example.query.enquiries.EnquiryController;
 import org.example.query.enums.QueryStatus;
 import org.example.query.suggestions.SuggestionController;
 import org.example.reports.controllers.ReportController;
-import org.example.reports.interfaces.IReport;
 import org.example.reports.utils.GenerateCsv;
+import org.example.reports.utils.GenerateReport;
 import org.example.reports.utils.GenerateTxt;
 import org.example.users.controllers.StaffController;
 import org.example.users.controllers.StudentController;
@@ -25,8 +26,6 @@ import org.example.users.enums.UserType;
 import org.example.extractexcel.ExtractExcelModel;
 import org.example.extractexcel.ExtractExcelView;
 import org.example.login.controllers.LoginController;
-import org.example.users.views.StaffView;
-import org.example.users.views.StudentView;
 
 import java.util.*;
 
@@ -41,6 +40,18 @@ public class Main {
         // Grabbing the models and
         ArrayList<User> staffsModel = new ArrayList<User>();
         ArrayList<User> studentsModel = new ArrayList<User>();
+
+//        String currentDirectory = System.getProperty("user.dir");
+//
+//
+//		// Specify the relative path to your file
+//		String relativePath = "SC2002_Assignment/src/main/java/org/example/resources/student_list.xlsx";
+//		String relativePath2 = "SC2002_Assignment/src/main/java/org/example/resources/staff_list.xlsx";
+//		// Combine the current directory and relative path to create the full path
+//		String fullPath = currentDirectory + "/" + relativePath;
+//		String fullPath2 = currentDirectory + "/" + relativePath2;
+//
+//		System.out.println(fullPath);
 
         // Extract from excel
         ExtractExcelController extractExcelController = new ExtractExcelController(new ExtractExcelView());
@@ -69,8 +80,8 @@ public class Main {
 //            System.out.println(staff.getUserID());
 //        }
 
-        StaffController staffController = new StaffController(staffsModel, new StaffView());
-        StudentController studentController = new StudentController(studentsModel, new StudentView());
+        StaffController staffController = new StaffController(staffsModel);
+        StudentController studentController = new StudentController(studentsModel);
 
         // There can only be 1 login user at a time
         LoginController loginController = new LoginController();
@@ -107,7 +118,7 @@ public class Main {
 
             while (true){
                 try{
-                    loginController.showLoginScreen();
+                    loginController.render(new LoginView());
                     domain = scanner.nextInt();
                     switch (domain) { // Will throw exception is user credentials does not match
                         case 1 -> // Student
@@ -210,7 +221,7 @@ public class Main {
 
 //                                            filterCampNames = campStudentController.viewAllCamps(loginController.getUserID(), loginController.getFacultyName()); // -> It will ask 1. View More details -> 1.join 2. Enquire 3. Suggest 4. back     2. back
 
-                                            if(!campStudentController.hasAnyCampsToView(loginController.getUserID(), loginController.getFacultyName())){
+                                            if(!campStudentController.hasAnyCampsToViewForStudents(loginController.getUserID(), loginController.getFacultyName())){
                                                 System.out.println("No camps to view");
                                             }
                                             else {
@@ -219,7 +230,7 @@ public class Main {
                                                         innerBack = false;
                                                         System.out.println("*** View All Camps ***");
 
-                                                        choice = new FilterViewController().menuSelectChoice();
+                                                        choice = new FilterViewController().viewMenuSelectChoice();
 
                                                         if (choice == 6) // Back
                                                             break;
@@ -258,7 +269,7 @@ public class Main {
                                                         }
 
                                                         String campID = filterCampNames.get(choice-1); //campStudentController.getCampNameToView(choice, loginController.getUserID(), loginController.getFacultyName());
-                                                        campStudentController.getCampDetails(campID);
+                                                        campStudentController.showCampDetails(campID);
 
                                                         boolean innerInnerBack = false;
                                                         while(!innerInnerBack){
@@ -366,7 +377,7 @@ public class Main {
                                                         innerBack = false;
                                                         System.out.println("*** View My Camps ***");
 
-                                                        choice = new FilterViewController().menuSelectChoice();
+                                                        choice = new FilterViewController().viewMenuSelectChoice();
 
                                                         if (choice == 6) // Back
                                                             break;
@@ -404,7 +415,7 @@ public class Main {
                                                         }
 
                                                         String campID = filterCampNames.get(choice-1); //campStudentController.getCampNameToView(choice, loginController.getUserID(), loginController.getFacultyName());
-                                                        campStudentController.getCampDetails(campID);
+                                                        campStudentController.showCampDetails(campID);
 
                                                         boolean innerInnerBack = false;
                                                         while(!innerInnerBack){ // they can  enquire and suggest, reports, withdraw, report back
@@ -454,7 +465,7 @@ public class Main {
                                                                         }else{
 
                                                                             // Get the name of the staff in charge
-                                                                            String staffName = staffController.getUserActualName(campStaffController.getStaffInChargeIDOfCamp(campID));
+                                                                            String staffName = staffController.getUserActualName(campStaffController.getStaffInChargeID(campID));
 
                                                                             // Compile the data and pass it into the report controller
                                                                             ArrayList<String>  participants = campStudentController.getParticipantsInCamp(campName);
@@ -498,12 +509,12 @@ public class Main {
                                                                                     switch (reportChoice){
                                                                                         case 1 -> { // Generate in txt format
 
-                                                                                            IReport report = new GenerateTxt();
+                                                                                            GenerateReport report = new GenerateTxt();
                                                                                             reportController.generateReportOfAttendees(report);
 
                                                                                         }
                                                                                         case 2 -> { // Generate in csv format
-                                                                                            IReport report = new GenerateCsv();
+                                                                                            GenerateReport report = new GenerateCsv();
                                                                                             reportController.generateReportOfAttendees(report);
                                                                                         }
                                                                                         case 3 -> {
@@ -650,7 +661,7 @@ public class Main {
                                                         }
                                                         case 2 -> {
                                                             // View enquiries of other students
-                                                            if (!campStudentController.isStudentAlreadyPartOfCampCommitteeOfAnotherCamp(loginController.getUserID())){
+                                                            if (!campStudentController.isAlreadyPartOfCampCommitteeOfAnotherCamp(loginController.getUserID())){
                                                                 System.out.println("You are not a camp committee of any camp");
 
                                                             }else{
@@ -944,7 +955,7 @@ public class Main {
                                                         innerBack = false;
                                                         System.out.println("*** View All Camps ***");
 
-                                                        choice =  new FilterViewController().menuSelectChoice();
+                                                        choice =  new FilterViewController().viewMenuSelectChoice();
 
                                                         if (choice == 6) // Back
                                                             break;
@@ -981,7 +992,7 @@ public class Main {
                                                         }
 
                                                         String campID = filterCampNames.get(choice-1);
-                                                        campStaffController.getCampDetails(campID);
+                                                        campStaffController.showCampDetails(campID);
                                                         break;
                                                     }
 
@@ -1007,7 +1018,7 @@ public class Main {
                                                         innerBack = false;
                                                         System.out.println("*** View My Camps ***");
 
-                                                        choice =  new FilterViewController().menuSelectChoice();
+                                                        choice =  new FilterViewController().viewMenuSelectChoice();
 
                                                         if (choice == 6) // Back
                                                             break;
@@ -1041,13 +1052,13 @@ public class Main {
                                                         } catch (Exception e) {
                                                             System.out.println(e.getMessage());
                                                             scanner.nextLine();
-                                                            campStaffController.viewMyCamps(loginController.getUserID(), loginController.getFacultyName());
+//                                                            campStaffController.viewMyCamps(loginController.getUserID(), loginController.getFacultyName());
                                                             continue;
                                                         }
 
 
                                                         String campID = filterCampNames.get(choice-1);
-                                                        campStaffController.getCampDetails(campID);
+                                                        campStaffController.showCampDetails(campID);
 
 
 
@@ -1062,7 +1073,7 @@ public class Main {
                                                                         // Access through query controller and pass in the campID
                                                                         campStaffController.editCamp(loginController.getUserID(), campID, loginController.getFacultyName());
                                                                         // Refresh the page
-                                                                        campStaffController.getCampDetails(campID);
+                                                                        campStaffController.showCampDetails(campID);
                                                                     }
                                                                     case 2 -> { // View Suggestions
 
@@ -1307,7 +1318,7 @@ public class Main {
                                                                     ArrayList<Object> details = campStaffController.getCampDetailsForReport(campName);
 
 
-                                                                   reportController.addCampDetailsToReport(campName, (Date) details.get(1), (Date) details.get(2), (Date) details.get(3), (String) details.get(4), (String) details.get(5), (int) details.get(6), (int) details.get(7), (String) details.get(8), staffName, (boolean) details.get(9) ,participantsNames, campCommitteesNames, blacklistsNames);
+                                                                    reportController.addCampDetailsToReport(campName, (Date) details.get(1), (Date) details.get(2), (Date) details.get(3), (String) details.get(4), (String) details.get(5), (int) details.get(6), (int) details.get(7), (String) details.get(8), staffName, (boolean) details.get(9) ,participantsNames, campCommitteesNames, blacklistsNames);
 
 
                                                                 }
@@ -1323,12 +1334,12 @@ public class Main {
                                                                         switch (reportChoice){
                                                                             case 1 -> { // Generate in txt format
 
-                                                                                IReport report = new GenerateTxt();
+                                                                                GenerateReport report = new GenerateTxt();
                                                                                 reportController.generateReportOfAttendees(report);
 
                                                                             }
                                                                             case 2 -> { // Generate in csv format
-                                                                                IReport report = new GenerateCsv();
+                                                                                GenerateReport report = new GenerateCsv();
                                                                                 reportController.generateReportOfAttendees(report);
                                                                                 //TODO : Generate performance report of in CSV not dne under generateCSV.java
 
@@ -1429,13 +1440,13 @@ public class Main {
                                                                     switch (reportChoice){
                                                                         case 1 -> { // Generate in txt format
 
-                                                                            IReport report = new GenerateTxt();
+                                                                            GenerateReport report = new GenerateTxt();
 
                                                                             reportController.generateReportOfCampCommittee(report, pointsMap);
 
                                                                         }
                                                                         case 2 -> { // Generate in csv format
-                                                                            IReport report = new GenerateCsv();
+                                                                            GenerateReport report = new GenerateCsv();
                                                                             reportController.generateReportOfCampCommittee(report, pointsMap);
                                                                         }
                                                                         case 3 -> {

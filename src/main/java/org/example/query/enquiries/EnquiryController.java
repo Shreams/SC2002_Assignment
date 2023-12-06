@@ -10,11 +10,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
+/**
+ * @author Group1
+ * @version 1.0
+ * 
+ * The EnquiryController class is responsible for managing and controlling inquiries related to camps.
+ * It allows users to create, reply to, edit, and delete inquiries, as well as view and interact with them.
+ * The class also provides various query-related functionalities and validations.
+ */
 public class EnquiryController implements IQueryController {
-
+	 /**
+     * A HashMap to store and manage inquiries, where the keys are query IDs and the values are EnquiryModel objects.
+     */
     private HashMap<String, EnquiryModel> enquiries;
 
 
+    /**
+     * Constructs a new EnquiryController with an empty HashMap for inquiries.
+     */
     public EnquiryController() {
         enquiries = new HashMap<String, EnquiryModel>();
     }
@@ -23,6 +36,13 @@ public class EnquiryController implements IQueryController {
     // #  Query Modifiers  #
     // #####################
 
+    /**
+     * Allows a user to reply to a specific query.
+     *
+     * @param queryID      The ID of the query to which the user wants to reply.
+     * @param respondentID The ID of the user responding to the query.
+     * @return true if the reply was successful, false otherwise.
+     */
     @Override
     public boolean replyToQuery(String queryID, String respondentID) {
 
@@ -57,6 +77,12 @@ public class EnquiryController implements IQueryController {
 
     }
 
+    /**
+     * Creates a new inquiry regarding a camp.
+     *
+     * @param userID  The ID of the user creating the inquiry.
+     * @param campID  The ID of the camp associated with the inquiry.
+     */
     @Override
     public void createQuery(String userID, String campID) {
         Scanner scanner = new Scanner(System.in);
@@ -76,8 +102,20 @@ public class EnquiryController implements IQueryController {
         }
     }
 
+    /**
+     * Edits an existing inquiry if the user is the author and the inquiry is pending.
+     *
+     * @param userID   The ID of the user editing the inquiry.
+     * @param queryID  The ID of the inquiry to be edited.
+     */
     @Override
     public void editQuery (String userID, String queryID){
+
+        if(!enquiries.get(queryID).getAuthor().equals(userID)){
+            System.out.println("You are not the author of the enquiry or ");
+            return;
+        }
+
         if (enquiries.get(queryID).getAuthor().equals(userID) && enquiries.get(queryID).getStatus() == QueryStatus.PENDING) {
             Scanner scanner = new Scanner(System.in);
             System.out.println("*********** Edit Enquiry ***********");
@@ -86,17 +124,30 @@ public class EnquiryController implements IQueryController {
             enquiries.get(queryID).setQuery(enquiry);
             System.out.println("Your enquiry has been edited successfully!");
         } else {
-            System.out.println("You are not the author of the enquiry or the enquiry has been answered!");
+            System.out.println("The enquiry has been answered!");
         }
     }
 
+    /**
+     * Deletes an existing inquiry if the user is the author and the inquiry is pending.
+     *
+     * @param userID   The ID of the user deleting the enquiry.
+     * @param queryID  The ID of the enquiry to be deleted.
+     * Cannot be deleted if enquiry is answered
+     */
     @Override
     public void deleteQuery (String userID, String queryID){
+
+        if(!enquiries.get(queryID).getAuthor().equals(userID)){
+            System.out.println("You are not the author of the enquiry or ");
+            return;
+        }
+
         if (enquiries.get(queryID).getAuthor().equals(userID) && enquiries.get(queryID).getStatus() == QueryStatus.PENDING) {
             enquiries.remove(queryID);
             System.out.println("Your enquiry has been deleted successfully!");
         } else {
-            System.out.println("You are not the author of the enquiry or the enquiry has been answered!");
+            System.out.println("The enquiry has been answered!");
         }
     }
 
@@ -106,11 +157,21 @@ public class EnquiryController implements IQueryController {
     // #    Views         #
     // ####################
 
+    /**
+     * Displays a given query view.
+     *
+     * @param view The query view to be displayed.
+     */
     @Override
     public void showView (IQueryView view){
         view.display();
     }
 
+    /**
+     * Displays all inquiries associated with a specific camp.
+     *
+     * @param campID The ID of the camp for which inquiries should be displayed.
+     */
     @Override
     public void viewAllQueryOfThatCamp (String campID){
         int idx = 1;
@@ -129,6 +190,11 @@ public class EnquiryController implements IQueryController {
         }
     }
 
+    /**
+     * Displays detailed information about a specific inquiry.
+     *
+     * @param queryID The ID of the inquiry to be displayed.
+     */
     @Override
     public void showQueryDetails (String queryID){
         EnquiryModel model = enquiries.get(queryID);
@@ -137,6 +203,11 @@ public class EnquiryController implements IQueryController {
     }
 
 
+    /**
+     * Displays all inquiries created by a specific user.
+     *
+     * @param userID The ID of the user for whom inquiries should be displayed.
+     */
     @Override
     public void viewMyQuery (String userID){
         int idx = 1;
@@ -165,11 +236,23 @@ public class EnquiryController implements IQueryController {
     // #  Validators  #
     // ################
 
+    /**
+     * Checks if an inquiry with a given ID exists.
+     *
+     * @param queryID The ID of the inquiry to be checked.
+     * @return true if the inquiry exists, false otherwise.
+     */
     @Override
     public boolean isQueryExist(String queryID) {
         return enquiries.containsKey(queryID);
     }
 
+    /**
+     * Checks if a user has any inquiries.
+     *
+     * @param userID The ID of the user to check for inquiries.
+     * @return true if the user has inquiries, false otherwise.
+     */
     @Override
     public boolean hasAnyQuery (String userID){
         for (String key : enquiries.keySet()) {
@@ -182,6 +265,12 @@ public class EnquiryController implements IQueryController {
 
 
 
+    /**
+     * Checks if there are any inquiries associated with a specific camp.
+     *
+     * @param campID The ID of the camp to check for inquiries.
+     * @return true if there are inquiries for the camp, false otherwise.
+     */
     @Override
     public boolean hasAnyQueryOfThatCamp (String campID){
         for (String key : enquiries.keySet()) {
@@ -196,6 +285,13 @@ public class EnquiryController implements IQueryController {
     // #  Accessor & Mutator  #
     // ########################
 
+    /**
+     * Gets the ID of the user's inquiry from an index.
+     *
+     * @param idx    The index of the inquiry to retrieve.
+     * @param userID The ID of the user whose inquiries are being accessed.
+     * @return The ID of the inquiry or null if not found.
+     */
     @Override
     public String getMyQueryFromIdx ( int idx, String userID){
         int i = 1;
@@ -213,6 +309,13 @@ public class EnquiryController implements IQueryController {
 
 
 
+    /**
+     * Gets the ID of a camp's inquiry at a specific index.
+     *
+     * @param idx    The index of the inquiry to retrieve.
+     * @param campID The ID of the camp whose inquiries are being accessed.
+     * @return The ID of the inquiry or null if not found.
+     */
     @Override
     public String getCampQueryFromIdx ( int idx, String campID){
         int i = 1;
@@ -228,6 +331,12 @@ public class EnquiryController implements IQueryController {
         return null;
     }
 
+    /**
+     * Gets all inquiry IDs created by a specific user.
+     *
+     * @param userID The ID of the user whose inquiry IDs are being retrieved.
+     * @return A list of inquiry IDs associated with the user.
+     */
     @Override
     public ArrayList<String> getAllQueryByUserID (String userID){
         // Grab all the enquiries by the userID
@@ -242,6 +351,12 @@ public class EnquiryController implements IQueryController {
     }
 
 
+    /**
+     * Gets all inquiry IDs associated with a specific camp.
+     *
+     * @param campID The ID of the camp whose inquiry IDs are being retrieved.
+     * @return A list of inquiry IDs associated with the camp.
+     */
     @Override
     public ArrayList<String> getAllQueryByCampID (String campID){
         // Grab all the enquiries by the campID

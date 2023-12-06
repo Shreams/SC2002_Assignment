@@ -3,6 +3,14 @@ package org.example.query.views;
 import org.example.query.enums.QueryStatus;
 import org.example.query.interfaces.IQueryView;
 
+/**
+ * @author Group1
+ * @version 1.0
+ * 
+ * Represents a view of a suggestion in a query system.
+ * This class implements the IQueryView interface and is used to display information
+ * about a suggestion, including its author, status, camp name, suggestion text, and respondent.
+ */
 public class SuggestionView implements IQueryView {
 
     private  String author;
@@ -14,6 +22,16 @@ public class SuggestionView implements IQueryView {
 
     private String respondent;
 
+    /**
+     * Initializes a new SuggestionView object with the provided parameters.
+     *
+     * @param uid       The unique ID of the suggestion.
+     * @param author    The author of the suggestion.
+     * @param suggestion The suggestion text.
+     * @param status    The status of the suggestion (PENDING, APPROVED, or DENIED).
+     * @param campID    The ID of the camp associated with the suggestion.
+     * @param respondent The respondent to the suggestion.
+     */
     public SuggestionView(String uid, String author, String suggestion, QueryStatus status, String campID, String respondent) {
         this.author = author;
         this.suggestion = suggestion;
@@ -23,6 +41,10 @@ public class SuggestionView implements IQueryView {
         this.respondent = respondent;
     }
 
+    /**
+     * Displays the information about the suggestion, including its ID, author, status, camp name,
+     * suggestion text, and respondent.
+     */
     @Override
     public void display() {
         System.out.println("Suggestion ID: " + this.ID);

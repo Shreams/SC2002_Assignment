@@ -5,6 +5,14 @@ import org.example.camps.interfaces.ICampView;
 import java.util.ArrayList;
 import java.util.Date;
 
+
+/**
+ * Represents a view to print camp details.
+ * Implements the ICampView interface.
+ *
+ * @author Group1
+ * @version 1.0
+ */
 public class PrintCampDetails implements ICampView {
 
     private String campName;
@@ -38,6 +46,24 @@ public class PrintCampDetails implements ICampView {
 
 
 
+
+    /**
+     * Constructor for PrintCampDetails class.
+     *
+     * @param campName            The name of the camp.
+     * @param dates               An array containing start and end dates of the camp.
+     * @param registrationEndDate The registration end date for the camp.
+     * @param location            The location of the camp.
+     * @param campAccessbility     The accessibility of the camp.
+     * @param totalSlots          The total number of slots available for participants.
+     * @param campCommitteeSlots  The number of slots for the camp committee.
+     * @param description         The description of the camp.
+     * @param staffInChargeID     The ID of the staff in charge of the camp.
+     * @param visbility           The visibility status of the camp.
+     * @param participants        The list of participants in the camp.
+     * @param campCommittee       The list of members in the camp committee.
+     * @param blacklist           The list of blacklisted participants.
+     */
     public PrintCampDetails(String campName, Date[] dates, Date registrationEndDate, String location, String campAccessbility, int totalSlots, int campCommitteeSlots, String description, String staffInChargeID, boolean visbility, ArrayList<String> participants, ArrayList<String> campCommittee, ArrayList<String> blacklist) {
         this.campName = campName;
         this.dates = dates;
